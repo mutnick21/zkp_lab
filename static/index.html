@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZKP Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Atelier crypto · Preuves à divulgation nulle de connaissance</p>
+      <h1>Cassez la preuve.</h1>
+      <p class="lede">
+        Un prouveur affirme connaître une clé privée <var>x</var> sans jamais la révéler.
+        Le protocole est solide… mais son implémentation beaucoup moins.
+        <strong>Votre mission : retrouver votre <var>x</var>.</strong>
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ================= Protocole ================= -->
+    <section id="protocol" class="card">
+      <h2>Le protocole d'identification de Schnorr</h2>
+      <p>
+        On travaille dans un groupe d'ordre premier <var>q</var> engendré par <var>g</var>, modulo un premier <var>p</var>.
+        Le prouveur possède une clé privée <var>x</var> ; la clé publique est <var>y</var>&nbsp;=&nbsp;<var>g</var><sup><var>x</var></sup>&nbsp;mod&nbsp;<var>p</var>.
+      </p>
+      <div class="flow" aria-label="Échanges entre le prouveur et le vérifieur">
+        <div class="flow-head"><span>Prouveur <small>(connaît x)</small></span><span>Vérifieur <small>(connaît y)</small></span></div>
+        <div class="flow-row to-right">
+          <div class="flow-note">tire un nonce <var>r</var> au hasard</div>
+          <div class="flow-arrow"><span><var>t</var> = <var>g</var><sup><var>r</var></sup> mod <var>p</var></span></div>
+          <div class="flow-step">1. engagement</div>
+        </div>
+        <div class="flow-row to-left">
+          <div class="flow-step">2. défi</div>
+          <div class="flow-arrow"><span><var>c</var> aléatoire</span></div>
+          <div class="flow-note">choisit <var>c</var></div>
+        </div>
+        <div class="flow-row to-right">
+          <div class="flow-note">calcule la réponse</div>
+          <div class="flow-arrow"><span><var>s</var> = <var>r</var> + <var>c</var>·<var>x</var> mod <var>q</var></span></div>
+          <div class="flow-step">3. réponse</div>
+        </div>
+        <div class="flow-check">Le vérifieur accepte si <var>g</var><sup><var>s</var></sup> ≡ <var>t</var>·<var>y</var><sup><var>c</var></sup> (mod <var>p</var>)</div>
+      </div>
+      <p class="muted">
+        Bien implémenté, ce protocole ne révèle rien sur <var>x</var> : le nonce <var>r</var> masque <var>c</var>·<var>x</var>.
+        Chaque niveau ci-dessous casse une hypothèse différente. Chaque joueur a <strong>sa propre clé</strong> :
+        inutile de copier le voisin.
+      </p>
+    </section>
+
+    <!-- ================= Connexion ================= -->
+    <section id="login" class="card" hidden>
+      <h2>Entrer dans le labo</h2>
+      <form id="register-form" class="inline-form" autocomplete="off">
+        <label for="name">Pseudo</label>
+        <input id="name" name="name" maxlength="24" minlength="2" required placeholder="ex. alice">
+        <button type="submit">Obtenir mes clés</button>
+      </form>
+      <details class="sub">
+        <summary>J'ai déjà un jeton (autre appareil)</summary>
+        <form id="token-form" class="inline-form" autocomplete="off">
+          <label for="token-in">Jeton</label>
+          <input id="token-in" required>
+          <button type="submit" class="secondary">Se connecter</button>
+        </form>
+      </details>
+      <p class="msg" id="login-msg" role="status"></p>
+    </section>
+
+    <section id="player" class="playerbar" hidden>
+      <div><span class="muted">Connecté en tant que</span> <strong id="me-name"></strong></div>
+      <div class="score"><span id="me-points">0</span> pts</div>
+      <div class="player-actions">
+        <button type="button" class="ghost" id="show-token">Afficher mon jeton</button>
+        <button type="button" class="ghost" id="logout">Se déconnecter</button>
+      </div>
+      <div class="token-box" id="token-box" hidden>
+        <p class="muted">Gardez-le pour vos scripts (en-tête <code>X-Token</code>) ou pour vous reconnecter ailleurs.</p>
+        <div class="num-row"><code class="num" id="token-value"></code><button type="button" class="copy" data-copy-from="token-value">Copier</button></div>
+      </div>
+    </section>
+
+    <!-- ================= Niveaux ================= -->
+    <section id="levels">
+      <article class="card level" data-level="1">
+        <header class="level-head">
+          <div><span class="tag">Niveau 1</span><h2>Le groupe miniature</h2></div>
+          <span class="pts">100 pts</span><span class="solved-badge" hidden>Résolu ✓</span>
+        </header>
+        <p>
+          Alice trouvait les calculs sur 2048 bits trop lents. Elle a donc choisi un « petit » premier <var>p</var>.
+          Son prouveur est par ailleurs parfaitement honnête : nonce frais à chaque fois.
+        </p>
+        <div class="params" data-params></div>
+        <h3>Jouer le vérifieur</h3>
+        <div data-verifier></div>
+        <details class="hint"><summary>Indice 1</summary><p>Combien de bits fait <var>q</var> ? Combien de valeurs possibles pour <var>x</var> ?</p></details>
+        <details class="hint"><summary>Indice 2</summary><p>Tester les 2<sup>40</sup> valeurs une par une en Python prendrait des heures. L'algorithme <em>baby-step giant-step</em> résout le logarithme discret en O(√q) opérations, soit environ un million ici.</p></details>
+        <details class="hint"><summary>Indice 3</summary><p>Posez <var>m</var> = ⌈√q⌉ et écrivez <var>x</var> = <var>i</var>·<var>m</var> + <var>j</var>. Stockez <var>g</var><sup><var>j</var></sup> dans un dictionnaire (j &lt; m), puis parcourez <var>y</var>·(<var>g</var><sup>−m</sup>)<sup><var>i</var></sup> jusqu'à tomber sur une valeur connue. En Python : <code>pow(g, -m, p)</code>.</p></details>
+        <form class="submit-form inline-form" autocomplete="off">
+          <label>Votre x</label><input name="x" required placeholder="décimal ou 0x…"><button type="submit">Soumettre</button>
+        </form>
+        <p class="msg" role="status"></p>
+      </article>
+
+      <article class="card level" data-level="2">
+        <header class="level-head">
+          <div><span class="tag">Niveau 2</span><h2>L'optimisation de trop</h2></div>
+          <span class="pts">200 pts</span><span class="solved-badge" hidden>Résolu ✓</span>
+        </header>
+        <p>
+          Bob a retenu la leçon : groupe RFC 3526 de 2048 bits, rien à forcer de ce côté.
+          Mais il a voulu rendre son prouveur « plus rapide »… Interrogez-le autant que vous voulez.
+        </p>
+        <div class="params" data-params></div>
+        <h3>Jouer le vérifieur</h3>
+        <div data-verifier></div>
+        <details class="hint"><summary>Indice 1</summary><p>Lancez le protocole plusieurs fois et comparez les engagements <var>t</var> dans l'historique.</p></details>
+        <details class="hint"><summary>Indice 2</summary><p>Si <var>t</var> ne change pas, alors <var>r</var> non plus : <var>s</var><sub>1</sub> = <var>r</var> + <var>c</var><sub>1</sub>·<var>x</var> et <var>s</var><sub>2</sub> = <var>r</var> + <var>c</var><sub>2</sub>·<var>x</var> (mod <var>q</var>). Deux équations, deux inconnues.</p></details>
+        <details class="hint"><summary>Indice 3</summary><p><var>x</var> = (<var>s</var><sub>1</sub> − <var>s</var><sub>2</sub>) · (<var>c</var><sub>1</sub> − <var>c</var><sub>2</sub>)<sup>−1</sup> mod <var>q</var>. En Python : <code>pow(a, -1, q)</code> donne l'inverse modulaire.</p></details>
+        <form class="submit-form inline-form" autocomplete="off">
+          <label>Votre x</label><input name="x" required placeholder="décimal ou 0x…"><button type="submit">Soumettre</button>
+        </form>
+        <p class="msg" role="status"></p>
+      </article>
+
+      <article class="card level" data-level="3">
+        <header class="level-head">
+          <div><span class="tag">Niveau 3</span><h2>Le hasard prévisible</h2></div>
+          <span class="pts">300 pts</span><span class="solved-badge" hidden>Résolu ✓</span>
+        </header>
+        <p>
+          Charlie publie des preuves <em>non interactives</em> (heuristique de Fiat-Shamir : le défi est un haché).
+          Ses nonces ne se répètent jamais. Mais un extrait de son code a fuité dans un vieux commit.
+        </p>
+        <div class="params" data-params></div>
+        <h3>Extrait fuité</h3>
+        <pre class="code" id="leak"></pre>
+        <h3>Preuves publiées</h3>
+        <button type="button" id="l3-get" class="needs-login">Obtenir 2 nouvelles preuves</button>
+        <button type="button" id="l3-copy" class="secondary needs-login">Copier les preuves (Python)</button>
+        <div id="l3-proofs" class="proofs"></div>
+        <details class="hint"><summary>Indice 1</summary><p>Les nonces ne sont pas aléatoires : <var>r</var><sub>n+1</sub> = <var>A</var>·<var>r</var><sub>n</sub> + <var>B</var> mod <var>q</var>, avec <var>A</var> et <var>B</var> connus.</p></details>
+        <details class="hint"><summary>Indice 2</summary><p>Prenez deux preuves <strong>consécutives</strong> (index n et n+1). Les inconnues sont <var>r</var><sub>n</sub> et <var>x</var>, et chaque preuve donne une équation linéaire mod <var>q</var>.</p></details>
+        <details class="hint"><summary>Indice 3</summary><p>En substituant <var>r</var><sub>n</sub> = <var>s</var><sub>1</sub> − <var>c</var><sub>1</sub>·<var>x</var> dans la seconde : <var>x</var> = (<var>s</var><sub>2</sub> − <var>A</var>·<var>s</var><sub>1</sub> − <var>B</var>) · (<var>c</var><sub>2</sub> − <var>A</var>·<var>c</var><sub>1</sub>)<sup>−1</sup> mod <var>q</var>.</p></details>
+        <form class="submit-form inline-form" autocomplete="off">
+          <label>Votre x</label><input name="x" required placeholder="décimal ou 0x…"><button type="submit">Soumettre</button>
+        </form>
+        <p class="msg" role="status"></p>
+      </article>
+    </section>
+
+    <!-- ================= API ================= -->
+    <section class="card">
+      <details>
+        <summary><h2 class="inline">Mémo API (pour vos scripts)</h2></summary>
+        <p class="muted">Toutes les requêtes authentifiées portent l'en-tête <code>X-Token: &lt;votre jeton&gt;</code>. Les grands entiers circulent en chaînes.</p>
+        <pre class="code">GET  /api/me                                → vos paramètres (p, q, g, y) par niveau
+POST /api/commit   {"level": 1|2}           → {"t": "..."}
+POST /api/respond  {"level": 1|2, "c": "…"} → {"s": "..."}
+POST /api/l3/proofs                         → {"proofs": [{index, message, t, c, s}, …]}
+POST /api/submit   {"level": n, "x": "…"}   → {"ok": true|false}
+
+# Exemple
+curl -s -H "X-Token: $TOKEN" -H "Content-Type: application/json" \
+     -d '{"level": 2}' <span id="origin"></span>/api/commit</pre>
+      </details>
+    </section>
+
+    <!-- ================= Classement ================= -->
+    <section class="card" id="scoreboard">
+      <h2>Classement</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Joueur</th><th>N1</th><th>N2</th><th>N3</th><th class="r">Points</th></tr></thead>
+          <tbody id="score-body"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="muted small"><span class="fb">1er</span> = premier à résoudre ce niveau. Rafraîchi toutes les 10 s.</p>
+    </section>
+  </main>
+
+  <footer class="wrap muted small">
+    ZKP Lab : application volontairement vulnérable, à usage pédagogique uniquement. N'utilisez jamais ce code en production.
+  </footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

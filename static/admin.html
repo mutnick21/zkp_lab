@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZKP Lab Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="admin.js" defer></script>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <p class="eyebrow">ZKP Lab · Espace enseignant</p>
+      <h1>Administration</h1>
+    </header>
+
+    <section class="card">
+      <form id="auth" class="inline-form" autocomplete="off">
+        <label for="adm-token">Jeton admin</label>
+        <input id="adm-token" type="password" required placeholder="affiché dans les logs du serveur">
+        <button type="submit">Charger</button>
+      </form>
+      <p class="msg" id="msg" role="status"></p>
+    </section>
+
+    <section class="card" id="panel" hidden>
+      <h2>Partie en cours</h2>
+      <p class="muted" id="summary"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Joueur</th><th>Résolus</th><th>Tentatives</th><th>Preuves N3</th><th>Clés (survol pour voir)</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <h3>Réinitialiser</h3>
+      <div class="params-actions">
+        <button type="button" class="secondary" id="reset-players">Effacer les joueurs (garder le secret)</button>
+        <button type="button" class="secondary" id="reset-all">Tout régénérer (nouveau secret + nouveau groupe N1)</button>
+      </div>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

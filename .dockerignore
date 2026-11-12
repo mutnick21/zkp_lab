@@ -1,0 +1,7 @@
+solutions/
+data/
+.env
+*.md
+__pycache__/
+*.pyc
+.git/
