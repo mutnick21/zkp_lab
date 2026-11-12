@@ -6,14 +6,36 @@ Une page web **volontairement vulnérable** pour faire découvrir les preuves à
 
 ## Déploiement (Docker)
 
+Prérequis : [Git](https://git-scm.com/) et [Docker](https://docs.docker.com/get-docker/). Sous Windows ou macOS, Docker Desktop doit être **démarré**.
+
+**1. Récupérer le projet**
 ```bash
-# sur le serveur, dans ce dossier
-ZKP_ADMIN_TOKEN='un-mot-de-passe-long' docker compose up -d --build
-docker compose logs zkp-lab        # affiche le jeton admin s'il a été généré
+git clone https://github.com/mutnick21/zkp_lab.git
+cd zkp_lab
 ```
 
-- Page étudiants : `http://<serveur>:8080/`
-- Panneau enseignant : `http://<serveur>:8080/admin` (avec le jeton admin)
+**2. Lancer**, en choisissant un mot de passe admin :
+
+Linux / macOS :
+```bash
+ZKP_ADMIN_TOKEN='un-mot-de-passe-long' docker compose up -d --build
+```
+
+Windows (PowerShell) :
+```powershell
+$env:ZKP_ADMIN_TOKEN = 'un-mot-de-passe-long'
+docker compose up -d --build
+```
+
+**3. Ouvrir**
+- Page étudiants : http://localhost:8080
+- Panneau enseignant : http://localhost:8080/admin (avec le mot de passe admin)
+
+Sans mot de passe défini, un jeton est généré au démarrage : `docker compose logs zkp-lab` l'affiche.
+
+**Pour la classe** : les étudiants doivent être sur le même réseau et utiliser l'IP de la machine à la place de `localhost` (par exemple `http://192.168.1.20:8080`). Pour trouver cette IP : `ipconfig` sous Windows, `ip a` sous Linux. Le pare-feu doit autoriser le port 8080.
+
+**Arrêter** : `docker compose down`. Pour **tout effacer** (joueurs et clés) : `docker compose down -v`.
 
 L'état (secret serveur, joueurs, réussites) est conservé dans le volume Docker `zkp-data` et survit aux redémarrages.
 
