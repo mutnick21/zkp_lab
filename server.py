@@ -542,7 +542,7 @@ def main():
     ap.add_argument("--host", default=os.environ.get("ZKP_HOST", "0.0.0.0"))
     ap.add_argument("--port", type=int, default=int(os.environ.get("ZKP_PORT", "8080")))
     ap.add_argument("--state", default=os.environ.get("ZKP_STATE", str(BASE / "data" / "state.json")))
-    ap.add_argument("--small-bits", type=int, default=int(os.environ.get("ZKP_SMALL_BITS", "40")),
+    ap.add_argument("--small-bits", type=int, default=int(os.environ.get("ZKP_SMALL_BITS", "22")),
                     help="taille de p au niveau 1 (appliquée seulement à la création de l'état)")
     args = ap.parse_args()
 

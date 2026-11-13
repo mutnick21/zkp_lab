@@ -9,7 +9,7 @@ services:
       # Laissez vide pour qu'un jeton soit généré et affiché dans les logs.
       ZKP_ADMIN_TOKEN: "${ZKP_ADMIN_TOKEN:-}"
       # Taille de p au niveau 1 (appliquée seulement quand l'état est créé).
-      ZKP_SMALL_BITS: "${ZKP_SMALL_BITS:-40}"
+      ZKP_SMALL_BITS: "${ZKP_SMALL_BITS:-22}"
     volumes:
       - zkp-data:/app/data   # état persistant (joueurs, secret)
     read_only: true

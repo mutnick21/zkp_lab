@@ -101,7 +101,7 @@
         <h3>Jouer le vérifieur</h3>
         <div data-verifier></div>
         <details class="hint"><summary>Indice 1</summary><p>Combien de bits fait <var>q</var> ? Combien de valeurs possibles pour <var>x</var> ?</p></details>
-        <details class="hint"><summary>Indice 2</summary><p>Tester les 2<sup>40</sup> valeurs une par une en Python prendrait des heures. L'algorithme <em>baby-step giant-step</em> résout le logarithme discret en O(√q) opérations, soit environ un million ici.</p></details>
+        <details class="hint"><summary>Indice 2</summary><p>Avec <var>q</var> d'environ 2<sup>21</sup>, il n'y a que deux millions de candidats : testez-les tous ! Boucle sur <var>x</var>, calculez <var>g</var><sup><var>x</var></sup> mod <var>p</var> et comparez à <var>y</var>. Astuce : multipliez par <var>g</var> à chaque tour plutôt que de rappeler <code>pow</code>, c'est dix fois plus rapide.</p></details>
         <details class="hint"><summary>Indice 3</summary><p>Posez <var>m</var> = ⌈√q⌉ et écrivez <var>x</var> = <var>i</var>·<var>m</var> + <var>j</var>. Stockez <var>g</var><sup><var>j</var></sup> dans un dictionnaire (j &lt; m), puis parcourez <var>y</var>·(<var>g</var><sup>−m</sup>)<sup><var>i</var></sup> jusqu'à tomber sur une valeur connue. En Python : <code>pow(g, -m, p)</code>.</p></details>
         <form class="submit-form inline-form" autocomplete="off">
           <label>Votre x</label><input name="x" required placeholder="décimal ou 0x…"><button type="submit">Soumettre</button>

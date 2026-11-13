@@ -42,7 +42,7 @@ L'état (secret serveur, joueurs, réussites) est conservé dans le volume Docke
 | Variable | Défaut | Rôle |
 |---|---|---|
 | `ZKP_ADMIN_TOKEN` | généré à chaque démarrage | jeton du panneau `/admin` |
-| `ZKP_SMALL_BITS` | `40` | taille de *p* au niveau 1, prise en compte **seulement à la création de l'état** (sinon : bouton « Tout régénérer », ou `docker compose down -v`) |
+| `ZKP_SMALL_BITS` | `22` | taille de *p* au niveau 1 (22 bits : force brute en Python ≲ 20 s), prise en compte **seulement à la création de l'état** (sinon : bouton « Tout régénérer », ou `docker compose down -v`) |
 
 Sans Docker : `python3 server.py --port 8080` (Python 3.8 ou plus, aucune dépendance).
 
